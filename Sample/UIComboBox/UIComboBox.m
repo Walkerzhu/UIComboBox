@@ -8,14 +8,14 @@
 
 #import "UIComboBox.h"
 
-@interface UIComboBox () <UITableViewDelegate, UITableViewDataSource>
+
+@interface UIComboBox () <UITableViewDelegate, UITableViewDataSource /*, UIGestureRecognizerDelegate */>
 
 @property (nonatomic, strong) IBOutlet UIView *contentView;
 @property (weak, nonatomic) IBOutlet UILabel *textLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *rightView;
 
-@property (strong, nonatomic) UITableView* innerInputView;
-//@property (nonatomic, readwrite, retain) UIToolbar *innerInputAccessoryView;
+@property (strong, nonatomic) UITableView* tableView;
 
 @end
 
@@ -53,11 +53,11 @@
     _selectedItem = selectedItem;
     _textLabel.text = _entries[_selectedItem];
     
-    if (_innerInputView) {
+    if (_tableView) {
         NSIndexPath *path = [NSIndexPath indexPathForRow:_selectedItem inSection:0];
-        [_innerInputView selectRowAtIndexPath:path
-                                     animated:YES
-                               scrollPosition:UITableViewScrollPositionMiddle];
+        [_tableView selectRowAtIndexPath:path
+                                animated:YES
+                          scrollPosition:UITableViewScrollPositionMiddle];
     }
 }
 
@@ -80,6 +80,8 @@
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc]
                                           initWithTarget:self
                                           action:@selector(tapHandle)];
+    //tapGesture.cancelsTouchesInView = NO;
+    //tapGesture.delegate = self;
     [self addGestureRecognizer:tapGesture];
     self.userInteractionEnabled = YES;
 }
@@ -97,13 +99,38 @@
 
 #pragma mark - firstResponder
 - (void)tapHandle {
-#pragma mark - TODO: customize this action for iPhone and iPad
-    [self becomeFirstResponder];
+    if (!_tableView) {
+        CGRect frame = self.frame;
+        frame.origin.y += self.frame.size.height + 2.0;
+        frame.size.height = 160;
+        _tableView = [[UITableView alloc] initWithFrame:frame];
+        [_tableView setDelegate:self];
+        [_tableView setDataSource:self];
+        _tableView.layer.cornerRadius = 6.0f;
+        _tableView.layer.borderWidth = 1.0f;
+    }
+    
+    if (_tableView.superview == nil) {
+        [self.superview addSubview:_tableView];
+
+        
+        NSIndexPath *path = [NSIndexPath indexPathForRow:_selectedItem inSection:0];
+        [_tableView selectRowAtIndexPath:path
+                                animated:YES
+                          scrollPosition:UITableViewScrollPositionMiddle];
+    }
+
 }
 
-- (BOOL)canBecomeFirstResponder {
-    return YES;
-}
+//- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+//{
+//    if (CGRectContainsPoint(_innerInputView.frame,
+//                            [touch locationInView:[_innerInputView superview]]))
+//    {
+//        return NO;
+//    }
+//    return YES;
+//}
 
 #pragma mark - change state when highlighed
 
@@ -114,43 +141,6 @@
     UIColor *shadowColor = highlighted ? [UIColor lightGrayColor] : nil;
     _textLabel.shadowColor = shadowColor;
 }
-
-#pragma mark - 'inputView' and 'inputAccessoryView'
-
--(UIView *)inputView {
-    if (!_innerInputView) {
-        _innerInputView = [[UITableView alloc] initWithFrame:CGRectMake(100, 100, 320, 162)];
-        [_innerInputView setDelegate:self];
-        [_innerInputView setDataSource:self];
-    }
-    
-    NSIndexPath *path = [NSIndexPath indexPathForRow:_selectedItem inSection:0];
-    [_innerInputView selectRowAtIndexPath:path
-                                 animated:YES
-                           scrollPosition:UITableViewScrollPositionMiddle];
-
-    return _innerInputView;
-}
-
-//- (UIView *)inputAccessoryView {
-//    if (!_innerInputAccessoryView) {
-//        UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
-//        UIBarButtonItem *flexibleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-//                                                                                      target:nil
-//                                                                                      action:nil];
-//        UIBarButtonItem *doneItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-//                                                                                  target:self
-//                                                                                  action:@selector(pressDone)];
-//        toolbar.items = @[flexibleItem, doneItem];
-//        _innerInputAccessoryView = toolbar;
-//    }
-//    return _innerInputAccessoryView;
-//}
-//
-//- (void)pressDone {
-//    [self resignFirstResponder];
-//}
-
 
 #pragma mark - UITableViewDelegate and UITableViewDataSource
 
@@ -165,7 +155,7 @@
 }
 
 
-#define kTableViewCellHeight 28.0f
+#define kTableViewCellHeight 32.0f
 
 - (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -183,10 +173,12 @@
     return cell;
 }
 
-- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)          tableView:(UITableView *)tableView
+    didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     self.selectedItem = indexPath.row;
-    [self resignFirstResponder];
+    
+    [_tableView removeFromSuperview];
 }
 
 @end
