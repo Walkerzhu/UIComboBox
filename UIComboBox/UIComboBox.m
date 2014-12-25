@@ -8,8 +8,63 @@
 
 #import "UIComboBox.h"
 
+#define __USING_ANIMATE__ 0
 
-@interface UIComboBox () <UITableViewDelegate, UITableViewDataSource /*, UIGestureRecognizerDelegate */>
+//========================== PassthroughView =============================================
+
+@protocol PassthroughViewDelegate <NSObject>
+-(void)doPassthrough:(BOOL)isPass;
+@end
+
+
+@interface PassthroughView : UIView
+@property (nonatomic, copy) NSArray *passViews;
+@property(nonatomic) BOOL testHits;
+@property(nonatomic, assign) id<PassthroughViewDelegate> delegate;
+@end
+
+
+@implementation PassthroughView
+
+-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    if (self.testHits) {
+        return nil;
+    }
+    if (!self.passViews || (self.passViews && self.passViews.count==0)) {
+        return nil;
+    }
+    UIView *hitView = [super hitTest:point withEvent:event];
+    if (hitView == self) {
+        self.testHits = YES;
+        CGPoint superPoint = [self.superview convertPoint:point fromView:self];
+        UIView *superHitView = [self.superview hitTest:superPoint withEvent:event];
+        self.testHits = NO;
+        BOOL pass = [self isPassthroughView:superHitView];
+        if (pass) {
+            hitView = superHitView;
+        }
+        [self.delegate doPassthrough:pass];
+    }
+    return hitView;
+}
+
+-(BOOL)isPassthroughView:(UIView *)view {
+    if (view == nil) {
+        return NO;
+    }
+    if ([self.passViews containsObject:view]) {
+        return YES;
+    }
+    return [self isPassthroughView:view.superview];
+}
+
+@end
+
+
+//========================== UIComboBox =============================================
+
+
+@interface UIComboBox () <UITableViewDelegate, UITableViewDataSource, PassthroughViewDelegate /*, UIGestureRecognizerDelegate */>
 
 @property (nonatomic, strong) IBOutlet UIView *contentView;
 @property (weak, nonatomic) IBOutlet UILabel *textLabel;
@@ -17,6 +72,7 @@
 
 @property (strong, nonatomic) UITableView* tableView;
 
+@property(strong, nonatomic) PassthroughView *passthroughView;
 @end
 
 @implementation UIComboBox
@@ -102,7 +158,7 @@
     if (!_tableView) {
         CGRect frame = self.frame;
         frame.origin.y += self.frame.size.height + 2.0;
-        frame.size.height = 160;
+        frame.size.height = 0.0;
         _tableView = [[UITableView alloc] initWithFrame:frame];
         [_tableView setDelegate:self];
         [_tableView setDataSource:self];
@@ -111,13 +167,36 @@
     }
     
     if (_tableView.superview == nil) {
+        CGRect frame = _tableView.frame;
+        frame.size.height = 160.0;
+        
         [self.superview addSubview:_tableView];
-
+        
+#if __USING_ANIMATE__
+        [UIView animateWithDuration:0.5 animations:^{
+            _tableView.frame = frame;
+        } completion:^(BOOL finished) {
+            //
+        }];
+#else
+        _tableView.frame = frame;
+#endif
         
         NSIndexPath *path = [NSIndexPath indexPathForRow:_selectedItem inSection:0];
         [_tableView selectRowAtIndexPath:path
                                 animated:YES
                           scrollPosition:UITableViewScrollPositionMiddle];
+        
+        UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
+        assert(keyWindow);
+        CGRect rc = keyWindow.frame;
+
+        if (_passthroughView == nil) {
+            _passthroughView = [[PassthroughView alloc] initWithFrame:rc];
+            _passthroughView.passViews = [NSArray arrayWithObjects:self, _tableView, nil];
+            _passthroughView.delegate = self;
+        }
+        [self.superview addSubview:_passthroughView];
     }
 
 }
@@ -177,8 +256,32 @@
     didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     self.selectedItem = indexPath.row;
-    
+    [self doClearup];
+}
+
+-(void) doClearup {
+#if __USING_ANIMATE__
+    [UIView animateWithDuration:0.5 animations:^{
+        CGRect frame = _tableView.frame;
+        frame.size.height = 0.0;
+        _tableView.frame = frame;
+    } completion:^(BOOL finished) {
+        [_tableView removeFromSuperview];
+        [_passthroughView removeFromSuperview];
+    }];
+#else
     [_tableView removeFromSuperview];
+    [_passthroughView removeFromSuperview];
+#endif
+}
+
+
+#pragma mark - PassthroughViewDelegate
+
+-(void)doPassthrough:(BOOL)isPass {
+    if (!isPass) {
+        [self doClearup];
+    }
 }
 
 @end
