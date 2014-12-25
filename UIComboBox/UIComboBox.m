@@ -167,6 +167,9 @@
     }
     
     if (_tableView.superview == nil) {
+        _rightView.image = [UIImage imageNamed:@"combobox_up"];
+        _rightView.highlightedImage = [UIImage imageNamed:@"combobox_up_highlighed"];
+        
         CGRect frame = _tableView.frame;
         frame.size.height = 160.0;
         
@@ -187,16 +190,16 @@
                                 animated:YES
                           scrollPosition:UITableViewScrollPositionMiddle];
         
-        UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
-        assert(keyWindow);
-        CGRect rc = keyWindow.frame;
-
         if (_passthroughView == nil) {
+            CGRect rc = [[UIApplication sharedApplication] keyWindow].frame;
+
             _passthroughView = [[PassthroughView alloc] initWithFrame:rc];
             _passthroughView.passViews = [NSArray arrayWithObjects:self, _tableView, nil];
             _passthroughView.delegate = self;
         }
         [self.superview addSubview:_passthroughView];
+    } else {
+        [self doClearup];
     }
 
 }
@@ -247,6 +250,7 @@
     UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if (cell==nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+        cell.textLabel.font = _textLabel.font;
     }
     cell.textLabel.text = [[_entries objectAtIndex:[indexPath row] ] description];
     return cell;
@@ -273,6 +277,8 @@
     [_tableView removeFromSuperview];
     [_passthroughView removeFromSuperview];
 #endif
+    _rightView.image = [UIImage imageNamed:@"combobox_down"];
+    _rightView.highlightedImage = [UIImage imageNamed:@"combobox_down_highlighed"];
 }
 
 
