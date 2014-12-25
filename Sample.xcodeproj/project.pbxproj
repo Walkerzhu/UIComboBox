@@ -16,10 +16,10 @@
 		5E50C3FD1A4A7F7A00CE5795 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5E50C3FC1A4A7F7A00CE5795 /* Images.xcassets */; };
 		5E50C41C1A4A800B00CE5795 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E50C41A1A4A800B00CE5795 /* ViewController.m */; };
 		5E50C41D1A4A800B00CE5795 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E50C41B1A4A800B00CE5795 /* ViewController.xib */; };
-		5E50C4241A4A833A00CE5795 /* UIComboBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E50C4231A4A833A00CE5795 /* UIComboBox.m */; };
-		5E50C4261A4A83E400CE5795 /* UIComboBox.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E50C4251A4A83E400CE5795 /* UIComboBox.xib */; };
-		5E50C4291A4A876800CE5795 /* combobox_down_highlighed@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E50C4271A4A876800CE5795 /* combobox_down_highlighed@2x.png */; };
-		5E50C42A1A4A876800CE5795 /* combobox_down@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E50C4281A4A876800CE5795 /* combobox_down@2x.png */; };
+		5E5BE94E1A4BA7F6005905DB /* combobox_down@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E5BE9491A4BA7F6005905DB /* combobox_down@2x.png */; };
+		5E5BE94F1A4BA7F6005905DB /* combobox_down_highlighed@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E5BE94A1A4BA7F6005905DB /* combobox_down_highlighed@2x.png */; };
+		5E5BE9501A4BA7F6005905DB /* UIComboBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E5BE94C1A4BA7F6005905DB /* UIComboBox.m */; };
+		5E5BE9511A4BA7F6005905DB /* UIComboBox.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E5BE94D1A4BA7F6005905DB /* UIComboBox.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,11 +38,11 @@
 		5E50C4191A4A800B00CE5795 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		5E50C41A1A4A800B00CE5795 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		5E50C41B1A4A800B00CE5795 /* ViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewController.xib; sourceTree = "<group>"; };
-		5E50C4221A4A833A00CE5795 /* UIComboBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIComboBox.h; sourceTree = "<group>"; };
-		5E50C4231A4A833A00CE5795 /* UIComboBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIComboBox.m; sourceTree = "<group>"; };
-		5E50C4251A4A83E400CE5795 /* UIComboBox.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UIComboBox.xib; sourceTree = "<group>"; };
-		5E50C4271A4A876800CE5795 /* combobox_down_highlighed@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "combobox_down_highlighed@2x.png"; sourceTree = "<group>"; };
-		5E50C4281A4A876800CE5795 /* combobox_down@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "combobox_down@2x.png"; sourceTree = "<group>"; };
+		5E5BE9491A4BA7F6005905DB /* combobox_down@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "combobox_down@2x.png"; sourceTree = "<group>"; };
+		5E5BE94A1A4BA7F6005905DB /* combobox_down_highlighed@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "combobox_down_highlighed@2x.png"; sourceTree = "<group>"; };
+		5E5BE94B1A4BA7F6005905DB /* UIComboBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIComboBox.h; sourceTree = "<group>"; };
+		5E5BE94C1A4BA7F6005905DB /* UIComboBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIComboBox.m; sourceTree = "<group>"; };
+		5E5BE94D1A4BA7F6005905DB /* UIComboBox.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UIComboBox.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,7 +90,7 @@
 		5E50C3F01A4A7F7900CE5795 /* Sample */ = {
 			isa = PBXGroup;
 			children = (
-				5E50C4211A4A833A00CE5795 /* UIComboBox */,
+				5E5BE9481A4BA7F6005905DB /* UIComboBox */,
 				5E50C3F91A4A7F7900CE5795 /* AppDelegate.h */,
 				5E50C3FA1A4A7F7A00CE5795 /* AppDelegate.m */,
 				5E50C3FC1A4A7F7A00CE5795 /* Images.xcassets */,
@@ -113,17 +113,17 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		5E50C4211A4A833A00CE5795 /* UIComboBox */ = {
+		5E5BE9481A4BA7F6005905DB /* UIComboBox */ = {
 			isa = PBXGroup;
 			children = (
-				5E50C4271A4A876800CE5795 /* combobox_down_highlighed@2x.png */,
-				5E50C4281A4A876800CE5795 /* combobox_down@2x.png */,
-				5E50C4221A4A833A00CE5795 /* UIComboBox.h */,
-				5E50C4231A4A833A00CE5795 /* UIComboBox.m */,
-				5E50C4251A4A83E400CE5795 /* UIComboBox.xib */,
+				5E5BE9491A4BA7F6005905DB /* combobox_down@2x.png */,
+				5E5BE94A1A4BA7F6005905DB /* combobox_down_highlighed@2x.png */,
+				5E5BE94B1A4BA7F6005905DB /* UIComboBox.h */,
+				5E5BE94C1A4BA7F6005905DB /* UIComboBox.m */,
+				5E5BE94D1A4BA7F6005905DB /* UIComboBox.xib */,
 			);
 			path = UIComboBox;
-			sourceTree = "<group>";
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -176,12 +176,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5E5BE9511A4BA7F6005905DB /* UIComboBox.xib in Resources */,
 				5E50C3F51A4A7F7900CE5795 /* InfoPlist.strings in Resources */,
-				5E50C4291A4A876800CE5795 /* combobox_down_highlighed@2x.png in Resources */,
+				5E5BE94F1A4BA7F6005905DB /* combobox_down_highlighed@2x.png in Resources */,
+				5E5BE94E1A4BA7F6005905DB /* combobox_down@2x.png in Resources */,
 				5E50C41D1A4A800B00CE5795 /* ViewController.xib in Resources */,
-				5E50C4261A4A83E400CE5795 /* UIComboBox.xib in Resources */,
 				5E50C3FD1A4A7F7A00CE5795 /* Images.xcassets in Resources */,
-				5E50C42A1A4A876800CE5795 /* combobox_down@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -194,7 +194,7 @@
 			files = (
 				5E50C41C1A4A800B00CE5795 /* ViewController.m in Sources */,
 				5E50C3FB1A4A7F7A00CE5795 /* AppDelegate.m in Sources */,
-				5E50C4241A4A833A00CE5795 /* UIComboBox.m in Sources */,
+				5E5BE9501A4BA7F6005905DB /* UIComboBox.m in Sources */,
 				5E50C3F71A4A7F7900CE5795 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
