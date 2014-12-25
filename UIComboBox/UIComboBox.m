@@ -98,7 +98,7 @@
 
 - (instancetype)init
 {
-    self = [super init];
+    self = [super initWithFrame:CGRectMake(58, 102, 165, 37)];
     if (self) {
         [self loadContentViewFromNib];
     }
@@ -140,6 +140,8 @@
     //tapGesture.delegate = self;
     [self addGestureRecognizer:tapGesture];
     self.userInteractionEnabled = YES;
+    
+    self.textLabel.text = @"";
 }
 
 - (NSLayoutConstraint *)pin:(id)item attribute:(NSLayoutAttribute)attribute
@@ -259,8 +261,10 @@
 - (void)          tableView:(UITableView *)tableView
     didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    self.selectedItem = indexPath.row;
+    int selectedItem = indexPath.row;
+    self.selectedItem = selectedItem;
     [self doClearup];
+    [self.delegate comboBox:self selected:selectedItem];
 }
 
 -(void) doClearup {

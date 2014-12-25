@@ -9,7 +9,7 @@
 #import "ViewController.h"
 #import "UIComboBox.h"
 
-@interface ViewController ()
+@interface ViewController () <UIComboBoxDelegate>
 
 @property (weak, nonatomic) IBOutlet UIComboBox *myComboBox;
 @end
@@ -33,6 +33,19 @@
     self.myComboBox.backgroundColor = [UIColor whiteColor];
     self.myComboBox.entries = @[@"15 minutes", @"30 minutes", @"1 hours", @"2 hours"];
     self.myComboBox.selectedItem = 1;
+    self.myComboBox.delegate = self;
+
+#if 0
+    UIComboBox *box = [[UIComboBox alloc] initWithFrame:CGRectMake(58, 202, 165, 37)];
+#else
+    UIComboBox *box = [[UIComboBox alloc] init];
+    box.frame = CGRectMake(58, 202, 165, 37);
+#endif
+    box.delegate = self;
+    box.entries = @[@"xxxx", @"yyyy", @"zzzz", @"hhhh", @"wwww", @"aaaaa", @"bbbb"];
+    box.selectedItem = 5;
+
+    [self.view addSubview:box];
 }
 
 - (void)didReceiveMemoryWarning
@@ -43,6 +56,10 @@
 
 - (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     [self.view endEditing:YES];
+}
+
+-(void)comboBox:(UIComboBox *)comboBox selected:(int)selected {
+    NSLog(@"%@ select changed to %d", comboBox, selected);
 }
 
 @end
