@@ -107,7 +107,7 @@
 
 - (void)setSelectedItem:(NSUInteger)selectedItem {
     _selectedItem = selectedItem;
-    _textLabel.text = _entries[_selectedItem];
+    _textLabel.text = [_entries[_selectedItem] description];
     
     if (_tableView) {
         NSIndexPath *path = [NSIndexPath indexPathForRow:_selectedItem inSection:0];
