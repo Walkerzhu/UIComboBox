@@ -15,7 +15,7 @@ Add the following line to your application:
     [self.view addSubview:box];
 
 ## Supported OS
-Tested in iOS 6.0, 7.0 8.0 device and simulator
+Tested in iOS 6.0, 7.0, 8.0 device and simulator
 
 ## LICENSE
 Released in [MIT License](http://opensource.org/licenses/mit-license.php)
