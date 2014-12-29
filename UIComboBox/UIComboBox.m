@@ -1,6 +1,6 @@
 //
 //  UIComboBox.m
-//  Sample
+//  UIComboBox
 //
 //  Created by abc123 on 14-12-24.
 //  Copyright (c) 2014 Ralph Shane. All rights reserved.
@@ -64,11 +64,10 @@
 //========================== UIComboBox =============================================
 
 
-@interface UIComboBox () <UITableViewDelegate, UITableViewDataSource, PassthroughViewDelegate /*, UIGestureRecognizerDelegate */>
+@interface UIComboBox () <UITableViewDelegate, UITableViewDataSource, PassthroughViewDelegate>
 
-@property (nonatomic, strong) IBOutlet UIView *contentView;
-@property (weak, nonatomic) IBOutlet UILabel *textLabel;
-@property (weak, nonatomic) IBOutlet UIImageView *rightView;
+@property (strong, nonatomic) UILabel *textLabel;
+@property (strong, nonatomic) UIImageView *rightView;
 
 @property (strong, nonatomic) UITableView* tableView;
 
@@ -77,21 +76,24 @@
 
 @implementation UIComboBox
 
+-(NSString *)description {
+    return [NSString stringWithFormat:@"UIComboBox instance %0xd", (int)self];
+}
+
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        [self loadContentViewFromNib];
+        [self initSubviews];
     }
     return self;
 }
-
 
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
-        [self loadContentViewFromNib];
+        [self initSubviews];
     }
     return self;
 }
@@ -100,7 +102,7 @@
 {
     self = [super initWithFrame:CGRectMake(58, 102, 165, 37)];
     if (self) {
-        [self loadContentViewFromNib];
+        [self initSubviews];
     }
     return self;
 }
@@ -117,42 +119,40 @@
     }
 }
 
-- (void)loadContentViewFromNib {
-    NSString *className = NSStringFromClass([self class]);
-    self.contentView = [[[NSBundle mainBundle] loadNibNamed:className owner:self options:nil] firstObject];
-    [self addSubview:self.contentView];
+-(void)initSubviews {
     self.layer.cornerRadius = 7.;
     self.layer.borderWidth = .5;
     self.layer.borderColor = [UIColor grayColor].CGColor;
-    self.layer.masksToBounds = YES;
     
-    _contentView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.textLabel = [[UILabel alloc] init];
+    self.textLabel.textAlignment = NSTextAlignmentCenter;
+    [self addSubview:self.textLabel];
     
-    [self addConstraint:[self pin:_contentView attribute:NSLayoutAttributeTop]];
-    [self addConstraint:[self pin:_contentView attribute:NSLayoutAttributeLeft]];
-    [self addConstraint:[self pin:_contentView attribute:NSLayoutAttributeBottom]];
-    [self addConstraint:[self pin:_contentView attribute:NSLayoutAttributeRight]];
+    self.rightView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"combobox_down"]];
+    self.rightView.highlightedImage = [UIImage imageNamed:@"combobox_down_highlighed"];
+    [self addSubview:self.rightView];
     
-    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc]
-                                          initWithTarget:self
-                                          action:@selector(tapHandle)];
-    //tapGesture.cancelsTouchesInView = NO;
-    //tapGesture.delegate = self;
-    [self addGestureRecognizer:tapGesture];
+    [self addTarget:self action:@selector(tapHandle) forControlEvents:UIControlEventTouchUpInside];
     self.userInteractionEnabled = YES;
-    
-    self.textLabel.text = @"";
 }
 
-- (NSLayoutConstraint *)pin:(id)item attribute:(NSLayoutAttribute)attribute
-{
-    return [NSLayoutConstraint constraintWithItem:self
-                                        attribute:attribute
-                                        relatedBy:NSLayoutRelationEqual
-                                           toItem:item
-                                        attribute:attribute
-                                       multiplier:1.0
-                                         constant:0.0];
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    CGRect rc; rc.size = self.frame.size;
+    
+    CGRect rcRight = rc;
+    rcRight.size.width = rc.size.height;
+    rcRight.origin.x = rc.origin.x + rc.size.width -rcRight.size.width;
+    
+    CGRect rcLabel = rc;
+    rcLabel.size.width = rc.size.width - rcRight.size.width;
+    
+    rcLabel = CGRectInset(rcLabel, 3, 3);
+    rcRight = CGRectInset(rcRight, 3, 3);
+    
+    self.textLabel.frame = rcLabel;
+    self.rightView.frame = rcRight;
 }
 
 #pragma mark - firstResponder
@@ -164,8 +164,9 @@
         _tableView = [[UITableView alloc] initWithFrame:frame];
         [_tableView setDelegate:self];
         [_tableView setDataSource:self];
-        _tableView.layer.cornerRadius = 6.0f;
-        _tableView.layer.borderWidth = 1.0f;
+        _tableView.layer.cornerRadius = 7.;
+        _tableView.layer.borderWidth = .5;
+        _tableView.layer.borderColor = [UIColor grayColor].CGColor;
     }
     
     if (_tableView.superview == nil) {
@@ -194,7 +195,7 @@
         
         if (_passthroughView == nil) {
             CGRect rc = [[UIApplication sharedApplication] keyWindow].frame;
-
+            
             _passthroughView = [[PassthroughView alloc] initWithFrame:rc];
             _passthroughView.passViews = [NSArray arrayWithObjects:self, _tableView, nil];
             _passthroughView.delegate = self;
@@ -203,18 +204,8 @@
     } else {
         [self doClearup];
     }
-
+    
 }
-
-//- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
-//{
-//    if (CGRectContainsPoint(_innerInputView.frame,
-//                            [touch locationInView:[_innerInputView superview]]))
-//    {
-//        return NO;
-//    }
-//    return YES;
-//}
 
 #pragma mark - change state when highlighed
 

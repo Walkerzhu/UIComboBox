@@ -21,7 +21,6 @@
 		5E5BE94E1A4BA7F6005905DB /* combobox_down@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E5BE9491A4BA7F6005905DB /* combobox_down@2x.png */; };
 		5E5BE94F1A4BA7F6005905DB /* combobox_down_highlighed@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E5BE94A1A4BA7F6005905DB /* combobox_down_highlighed@2x.png */; };
 		5E5BE9501A4BA7F6005905DB /* UIComboBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E5BE94C1A4BA7F6005905DB /* UIComboBox.m */; };
-		5E5BE9511A4BA7F6005905DB /* UIComboBox.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E5BE94D1A4BA7F6005905DB /* UIComboBox.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,7 +45,6 @@
 		5E5BE94A1A4BA7F6005905DB /* combobox_down_highlighed@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "combobox_down_highlighed@2x.png"; sourceTree = "<group>"; };
 		5E5BE94B1A4BA7F6005905DB /* UIComboBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIComboBox.h; sourceTree = "<group>"; };
 		5E5BE94C1A4BA7F6005905DB /* UIComboBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIComboBox.m; sourceTree = "<group>"; };
-		5E5BE94D1A4BA7F6005905DB /* UIComboBox.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UIComboBox.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,7 +124,6 @@
 				5E5BE94A1A4BA7F6005905DB /* combobox_down_highlighed@2x.png */,
 				5E5BE94B1A4BA7F6005905DB /* UIComboBox.h */,
 				5E5BE94C1A4BA7F6005905DB /* UIComboBox.m */,
-				5E5BE94D1A4BA7F6005905DB /* UIComboBox.xib */,
 			);
 			path = UIComboBox;
 			sourceTree = SOURCE_ROOT;
@@ -182,7 +179,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5E5BE9511A4BA7F6005905DB /* UIComboBox.xib in Resources */,
 				5E50C3F51A4A7F7900CE5795 /* InfoPlist.strings in Resources */,
 				5E5BE94F1A4BA7F6005905DB /* combobox_down_highlighed@2x.png in Resources */,
 				5E047F071A4BF8640000F34C /* combobox_up_highlighed@2x.png in Resources */,

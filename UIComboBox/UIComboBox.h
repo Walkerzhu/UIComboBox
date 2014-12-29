@@ -11,13 +11,12 @@
 @class UIComboBox;
 
 @protocol UIComboBoxDelegate <NSObject>
+@optional
 -(void) comboBox:(UIComboBox *)comboBox selected:(int)selected;
 @end
 
 @interface UIComboBox : UIControl
-
 @property (strong, nonatomic) NSArray *entries;
 @property (nonatomic) NSUInteger selectedItem;
 @property(nonatomic, strong) id<UIComboBoxDelegate> delegate;
-
 @end
