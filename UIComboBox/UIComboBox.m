@@ -10,6 +10,8 @@
 
 #define __USING_ANIMATE__ 0
 
+#define kComboBoxHeight 160.0
+
 //========================== PassthroughView =============================================
 
 @protocol PassthroughViewDelegate <NSObject>
@@ -70,6 +72,7 @@
 @property (strong, nonatomic) UIImageView *rightView;
 
 @property (strong, nonatomic) UITableView* tableView;
+@property (nonatomic) CGRect cachedTableViewFrame;
 
 @property(strong, nonatomic) PassthroughView *passthroughView;
 @end
@@ -139,7 +142,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    CGRect rc; rc.size = self.frame.size;
+    CGRect rc = CGRectZero; rc.size = self.frame.size;
     
     CGRect rcRight = rc;
     rcRight.size.width = rc.size.height;
@@ -157,26 +160,36 @@
 
 #pragma mark - firstResponder
 - (void)tapHandle {
+    UIView *topView = [UIComboBox topMostView:self];
+    assert(topView);
     if (!_tableView) {
         CGRect frame = self.frame;
         frame.origin.y += self.frame.size.height + 2.0;
         frame.size.height = 0.0;
+        
+        if (self.tableViewOnTop) {
+            frame.origin.y = self.frame.origin.y - 2.0 - kComboBoxHeight;
+        }
+        
         _tableView = [[UITableView alloc] initWithFrame:frame];
         [_tableView setDelegate:self];
         [_tableView setDataSource:self];
         _tableView.layer.cornerRadius = 7.;
         _tableView.layer.borderWidth = .5;
         _tableView.layer.borderColor = [UIColor grayColor].CGColor;
+        self.cachedTableViewFrame = frame;
     }
     
     if (_tableView.superview == nil) {
         _rightView.image = [UIImage imageNamed:@"combobox_up"];
         _rightView.highlightedImage = [UIImage imageNamed:@"combobox_up_highlighed"];
         
-        CGRect frame = _tableView.frame;
-        frame.size.height = 160.0;
+        CGRect frame = [self.superview convertRect:self.cachedTableViewFrame toView:topView];
+        _rightView.frame = frame;
         
-        [self.superview addSubview:_tableView];
+        frame.size.height = kComboBoxHeight;
+        
+        [topView addSubview:_tableView];
         
 #if __USING_ANIMATE__
         [UIView animateWithDuration:0.5 animations:^{
@@ -200,11 +213,10 @@
             _passthroughView.passViews = [NSArray arrayWithObjects:self, _tableView, nil];
             _passthroughView.delegate = self;
         }
-        [self.superview addSubview:_passthroughView];
+        [topView addSubview:_passthroughView];
     } else {
         [self doClearup];
     }
-    
 }
 
 #pragma mark - change state when highlighed
@@ -284,5 +296,18 @@
         [self doClearup];
     }
 }
+
+
+#pragma mark ---
+
++(UIView *) topMostView:(UIView *)view {
+    UIView *superView = view.superview;
+    if (superView) {
+        return [self topMostView:superView];
+    } else {
+        return view;
+    }
+}
+
 
 @end

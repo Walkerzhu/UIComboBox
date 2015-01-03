@@ -18,5 +18,6 @@
 @interface UIComboBox : UIControl
 @property (strong, nonatomic) NSArray *entries;
 @property (nonatomic) NSUInteger selectedItem;
+@property (nonatomic, assign) BOOL tableViewOnTop;
 @property(nonatomic, strong) id<UIComboBoxDelegate> delegate;
 @end
