@@ -248,7 +248,7 @@
 }
 
 
-#define kTableViewCellHeight 32.0f
+#define kTableViewCellHeight 28.0f
 
 - (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
