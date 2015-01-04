@@ -122,6 +122,12 @@
     }
 }
 
+-(void)setEnabled:(BOOL)enabled {
+    self.textLabel.enabled = enabled;
+    self.rightView.highlighted = !enabled;
+    [super setEnabled:enabled];
+}
+
 -(void)initSubviews {
     self.layer.cornerRadius = 7.;
     self.layer.borderWidth = .5;
