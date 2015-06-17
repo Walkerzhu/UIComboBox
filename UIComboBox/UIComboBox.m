@@ -21,15 +21,16 @@
 
 @interface PassthroughView : UIView
 @property (nonatomic, copy) NSArray *passViews;
-@property(nonatomic) BOOL testHits;
 @property(nonatomic, assign) id<PassthroughViewDelegate> delegate;
 @end
 
 
-@implementation PassthroughView
+@implementation PassthroughView {
+    BOOL _testHits;
+}
 
 -(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
-    if (self.testHits) {
+    if (_testHits) {
         return nil;
     }
     if (!self.passViews || (self.passViews && self.passViews.count==0)) {
@@ -37,10 +38,10 @@
     }
     UIView *hitView = [super hitTest:point withEvent:event];
     if (hitView == self) {
-        self.testHits = YES;
+        _testHits = YES;
         CGPoint superPoint = [self.superview convertPoint:point fromView:self];
         UIView *superHitView = [self.superview hitTest:superPoint withEvent:event];
-        self.testHits = NO;
+        _testHits = NO;
         BOOL pass = [self isPassthroughView:superHitView];
         if (pass) {
             hitView = superHitView;
@@ -67,17 +68,15 @@
 
 
 @interface UIComboBox () <UITableViewDelegate, UITableViewDataSource, PassthroughViewDelegate>
-
-@property (strong, nonatomic) UILabel *textLabel;
-@property (strong, nonatomic) UIImageView *rightView;
-
-@property (strong, nonatomic) UITableView* tableView;
-@property (nonatomic) CGRect cachedTableViewFrame;
-
-@property(strong, nonatomic) PassthroughView *passthroughView;
 @end
 
-@implementation UIComboBox
+@implementation UIComboBox {
+    UITableViewCell *_textLabel;
+    UIImageView *_rightView;
+    UITableView *_tableView;
+    CGRect _cachedTableViewFrame;
+    PassthroughView *_passthroughView;
+}
 
 -(NSString *)description {
     return [NSString stringWithFormat:@"UIComboBox instance %0xd", (int)self];
@@ -112,7 +111,17 @@
 
 - (void)setSelectedItem:(NSUInteger)selectedItem {
     _selectedItem = selectedItem;
-    _textLabel.text = [_entries[_selectedItem] description];
+    if (_entries.count == 0) {
+        return;
+    }
+    id obj = _entries[_selectedItem];
+
+    if ([obj respondsToSelector:@selector(description)]) {
+        _textLabel.textLabel.text = [obj performSelector:@selector(description)];
+    }
+    if ([obj respondsToSelector:@selector(image)]) {
+        _textLabel.imageView.image = [obj performSelector:@selector(image)];
+    }
     
     if (_tableView) {
         NSIndexPath *path = [NSIndexPath indexPathForRow:_selectedItem inSection:0];
@@ -123,23 +132,41 @@
 }
 
 -(void)setEnabled:(BOOL)enabled {
-    self.textLabel.enabled = enabled;
-    self.rightView.highlighted = !enabled;
+    //_textLabel.textLabel.enabled = enabled;
+    _textLabel.textLabel.textColor = enabled?[UIColor blackColor]:[UIColor grayColor];
+    _rightView.highlighted = !enabled;
     [super setEnabled:enabled];
+}
+
+- (void) setBorderColor:(UIColor *)borderColor {
+    _borderColor = borderColor;
+    self.layer.borderColor = _borderColor.CGColor;
+}
+
+- (UIFont *) font {
+    return _textLabel.textLabel.font;
+}
+
+- (void) setFont:(UIFont *)font {
+    _textLabel.textLabel.font = font;
+    if (_tableView) {
+        [_tableView reloadData];
+    }
 }
 
 -(void)initSubviews {
     self.layer.cornerRadius = 7.;
     self.layer.borderWidth = .5;
-    self.layer.borderColor = [UIColor grayColor].CGColor;
+    _borderColor = [UIColor colorWithCGColor:self.layer.borderColor];
     
-    self.textLabel = [[UILabel alloc] init];
-    self.textLabel.textAlignment = NSTextAlignmentCenter;
-    [self addSubview:self.textLabel];
+    _textLabel = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+    _textLabel.textLabel.textAlignment = NSTextAlignmentCenter;
+    _textLabel.backgroundColor = [UIColor clearColor];
+    [self addSubview:_textLabel];
     
-    self.rightView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"combobox_down"]];
-    self.rightView.highlightedImage = [UIImage imageNamed:@"combobox_down_highlighed"];
-    [self addSubview:self.rightView];
+    _rightView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"combobox_down"]];
+    _rightView.highlightedImage = [UIImage imageNamed:@"combobox_down_highlighed"];
+    [self addSubview:_rightView];
     
     [self addTarget:self action:@selector(tapHandle) forControlEvents:UIControlEventTouchUpInside];
     self.userInteractionEnabled = YES;
@@ -160,37 +187,54 @@
     rcLabel = CGRectInset(rcLabel, 3, 3);
     rcRight = CGRectInset(rcRight, 3, 3);
     
-    self.textLabel.frame = rcLabel;
-    self.rightView.frame = rcRight;
+    _textLabel.frame = rcLabel;
+    _rightView.frame = rcRight;
+}
+
+- (void) adjustPopupViewFrame {
+    CGRect frame = self.frame;
+    frame.origin.y += self.frame.size.height + 2.0;
+    frame.size.height = 0.0;
+
+    if (self.tableViewOnTop) {
+        frame.origin.y = self.frame.origin.y - 2.0 - kComboBoxHeight;
+    }
+
+    _tableView.frame = frame;
+    _cachedTableViewFrame = frame;
+}
+
+-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    if (self.enabled) {
+        if (CGRectContainsPoint(_textLabel.frame, point)) {
+            if (_tableView.superview == nil) {
+                [self tapHandle];
+            }
+        }
+    }
+    return [super hitTest:point withEvent:event];
 }
 
 #pragma mark - firstResponder
 - (void)tapHandle {
     UIView *topView = [UIComboBox topMostView:self];
-    assert(topView);
+    NSAssert(topView, @"Can not obtain the most-top leave view.");
     if (!_tableView) {
-        CGRect frame = self.frame;
-        frame.origin.y += self.frame.size.height + 2.0;
-        frame.size.height = 0.0;
-        
-        if (self.tableViewOnTop) {
-            frame.origin.y = self.frame.origin.y - 2.0 - kComboBoxHeight;
-        }
-        
-        _tableView = [[UITableView alloc] initWithFrame:frame];
+        _tableView = [[UITableView alloc] initWithFrame:CGRectZero];
         [_tableView setDelegate:self];
         [_tableView setDataSource:self];
         _tableView.layer.cornerRadius = 7.;
         _tableView.layer.borderWidth = .5;
-        _tableView.layer.borderColor = [UIColor grayColor].CGColor;
-        self.cachedTableViewFrame = frame;
+        _tableView.layer.borderColor = self.borderColor.CGColor;
     }
-    
+
+    [self adjustPopupViewFrame];
+
     if (_tableView.superview == nil) {
         _rightView.image = [UIImage imageNamed:@"combobox_up"];
         _rightView.highlightedImage = [UIImage imageNamed:@"combobox_up_highlighed"];
         
-        CGRect frame = [self.superview convertRect:self.cachedTableViewFrame toView:topView];
+        CGRect frame = [self.superview convertRect:_cachedTableViewFrame toView:topView];
         _rightView.frame = frame;
         
         frame.size.height = kComboBoxHeight;
@@ -208,10 +252,12 @@
 #endif
         
         NSIndexPath *path = [NSIndexPath indexPathForRow:_selectedItem inSection:0];
-        [_tableView selectRowAtIndexPath:path
-                                animated:YES
-                          scrollPosition:UITableViewScrollPositionMiddle];
-        
+        if (_entries.count) {
+            [_tableView selectRowAtIndexPath:path
+                                    animated:YES
+                              scrollPosition:UITableViewScrollPositionMiddle];
+        }
+
         if (_passthroughView == nil) {
             CGRect rc = [[UIApplication sharedApplication] keyWindow].frame;
             
@@ -232,7 +278,7 @@
     _rightView.highlighted = highlighted; // change button to highlighed state
     _textLabel.highlighted = highlighted; // change label to highlighed state
     UIColor *shadowColor = highlighted ? [UIColor lightGrayColor] : nil;
-    _textLabel.shadowColor = shadowColor;
+    _textLabel.textLabel.shadowColor = shadowColor;
 }
 
 #pragma mark - UITableViewDelegate and UITableViewDataSource
@@ -248,7 +294,7 @@
 }
 
 
-#define kTableViewCellHeight 28.0f
+#define kTableViewCellHeight 32.0f
 
 - (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -261,19 +307,31 @@
     UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if (cell==nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
-        cell.textLabel.font = _textLabel.font;
     }
-    cell.textLabel.text = [[_entries objectAtIndex:[indexPath row] ] description];
+
+    cell.textLabel.font = _textLabel.textLabel.font;
+
+    id obj = [_entries objectAtIndex:[indexPath row] ];
+
+    if ([obj respondsToSelector:@selector(description)]) {
+        cell.textLabel.text = [obj performSelector:@selector(description)];
+    }
+    if ([obj respondsToSelector:@selector(image)]) {
+        cell.imageView.image = [obj performSelector:@selector(image)];
+    }
+
     return cell;
 }
 
 - (void)          tableView:(UITableView *)tableView
     didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    int selectedItem = indexPath.row;
+    int selectedItem = (int) indexPath.row;
     self.selectedItem = selectedItem;
     [self doClearup];
-    [self.delegate comboBox:self selected:selectedItem];
+    if ([_delegate respondsToSelector:@selector(comboBox:selected:)]) {
+        [_delegate comboBox:self selected:selectedItem];
+    }
 }
 
 -(void) doClearup {
@@ -304,7 +362,7 @@
 }
 
 
-#pragma mark ---
+#pragma mark -
 
 +(UIView *) topMostView:(UIView *)view {
     UIView *superView = view.superview;

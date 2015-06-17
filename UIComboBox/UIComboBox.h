@@ -20,4 +20,6 @@
 @property (nonatomic) NSUInteger selectedItem;
 @property (nonatomic, assign) BOOL tableViewOnTop;
 @property(nonatomic, strong) id<UIComboBoxDelegate> delegate;
+@property(strong, nonatomic) UIColor *borderColor;
+@property(nonatomic, strong) UIFont *font;
 @end
